@@ -1,0 +1,9 @@
+client 				server
+SEND int n			ACK
+... n bytes (hash) ...		ACK | SEND
+
+if ACK, repeat
+
+if SEND,
+SEND int n			ACK
+... n bytes (data) ...		ACK
