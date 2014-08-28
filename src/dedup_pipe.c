@@ -28,7 +28,7 @@
 #define LISTEN_BACKLOG  24
 #define LISTEN_QUEUE    24
 
-void create(char *);
+void create(char *, char *);
 void extract();
 void print_hash(char, char *);
 void term(int);
@@ -99,7 +99,7 @@ main(int argc, char *argv[])
     fclose(fp);
 
     if (create_mode) {
-        create(argv[optind]);
+        create(argv[optind], fn);
     }
 
     if (extract_mode) {
@@ -110,7 +110,7 @@ main(int argc, char *argv[])
 }
 
 void
-create(char *fn)
+create(char *fn, char *name)
 {
     SHA_CTX ctx;
     char input[BUF_LEN + 1];
@@ -137,10 +137,9 @@ create(char *fn)
     cmd = CMD_NEW;
     send(sock, &cmd, sizeof(uint8_t), 0);
 
-    len = strlen(fn);
+    len = strlen(name);
     send(sock, &len, sizeof(uint16_t), 0);
-
-    send(sock, fn, len, 0);
+    send(sock, name, len, 0);
 
     while (!feof(in)) {
         memset(&input, 0, BUF_LEN + 1);
@@ -280,6 +279,7 @@ extract()
 
                     fn = malloc(len);
                     recv(conn.sock, fn, len, 0);
+                    fprintf(stderr, "> %s\n", fn);
                     fp = fopen(fn, "w");
 
                     recv(conn.sock, &cmd, sizeof(uint8_t), 0);
